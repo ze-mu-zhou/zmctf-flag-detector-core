@@ -1,0 +1,53 @@
+[package]
+name = "flag-detector"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+autobenches = false
+description = "ZMctf 核心分析与检测逻辑（提取、解码、规则与归档分析）"
+repository = "https://example.invalid/zmctf"
+readme = "../README.md"
+keywords = ["ctf", "security", "forensics"]
+categories = ["command-line-utilities", "development-tools"]
+
+[dependencies]
+base64.workspace = true
+hex.workspace = true
+url.workspace = true
+data-encoding.workspace = true
+bs58.workspace = true
+z85.workspace = true
+html-escape.workspace = true
+regex.workspace = true
+rayon.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+log.workspace = true
+memmap2.workspace = true
+sha2.workspace = true
+md5.workspace = true
+sha1.workspace = true
+chrono.workspace = true
+walkdir.workspace = true
+num_cpus = "1.16"
+urlencoding = "2.1"
+flate2 = "1.0"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+zip = "2.2"
+axum.workspace = true
+tool-runner = { path = "../tool-runner" }
+zmctf-constraints = { path = "../zmctf-constraints" }
+
+[lib]
+name = "flag_detector"
+path = "src/lib.rs"
+
+[[bin]]
+name = "zmctf-server"
+path = "src/bin/server.rs"
+
+[dev-dependencies]

@@ -1,0 +1,15 @@
+[package]
+name = "zmctf-constraints"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "ZMctf 全局资源与安全约束模型"
+repository = "https://example.invalid/zmctf"
+readme = "../README.md"
+keywords = ["ctf", "security", "forensics"]
+categories = ["command-line-utilities", "development-tools"]
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true

@@ -1,0 +1,5 @@
+    Checking zmctf-constraints v1.0.0 (F:\ZMctf\core\zmctf-constraints)
+    Checking tool-runner v1.0.0 (F:\ZMctf\core\tool-runner)
+    Checking flag-detector v1.0.0 (F:\ZMctf\core\flag-detector)
+    Checking floss-integration v1.0.0 (F:\ZMctf\core\floss-integration)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.69s

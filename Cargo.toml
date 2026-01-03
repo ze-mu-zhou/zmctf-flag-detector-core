@@ -1,0 +1,100 @@
+﻿[workspace]
+members = [
+    "flag-detector",
+    "floss-integration",
+    "tool-runner",
+    "zmctf-constraints",
+]
+resolver = "2"
+
+[workspace.package]
+version = "1.0.0"
+edition = "2021"
+authors = ["ZMctf Contributors"]
+license = "MIT"
+
+[workspace.dependencies]
+# 编码/解码
+base64 = "0.22"
+hex = "0.4"
+url = "2.5"
+data-encoding = "2.6"
+bs58 = "0.5"
+z85 = "3.0"
+html-escape = "0.2"
+
+# 正则表达式
+regex = "1.11"
+
+# 并行处理
+rayon = "1.10"
+
+# 异步运行时
+tokio = { version = "1.42", features = ["full"] }
+
+# 错误处理
+anyhow = "1.0"
+
+# 序列化
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+
+# 日志
+log = "0.4"
+
+# 内存映射
+memmap2 = "0.9"
+
+# 持久化缓存
+
+# 文件hash
+sha2 = "0.10"
+md5 = { package = "md-5", version = "0.10" }
+sha1 = "0.10"
+
+# 时间
+chrono = { version = "0.4", features = ["serde"] }
+
+walkdir = "2.5"
+
+# Web服务器
+axum = "0.7"
+
+[patch.crates-io]
+socket2 = { path = "vendor/socket2" }
+
+[workspace.lints.rust]
+# 1. 强制禁止 unsafe 代码 (由编译器强制，无法通过 #[allow] 绕过)
+unsafe_code = "forbid"
+
+# 直接开启最严厉的组 (慎用，可能会包含未列出的 lints)
+warnings = "deny"
+
+[workspace.lints.clippy]
+# 1. 开启所有主要 Lint 组，并设为 Deny (拒绝)
+all = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 } # 学究模式：极其严格
+nursery = { level = "deny", priority = -1 }  # 幼儿园模式：包含新进甚至不稳定的 lint
+cargo = { level = "deny", priority = -1 }    # 检查 Cargo.toml 的配置问题
+
+# 禁止使用 .unwrap()，强制使用 expect 或错误传播
+unwrap_used = "deny"
+# 禁止使用 .expect()，强制完整的错误处理 (比 unwrap_used 更严)
+expect_used = "deny"
+# 禁止使用 panic!，生产环境代码不应崩溃
+panic = "deny"
+# 禁止使用 todo! 和 unimplemented!，防止遗留未完成代码
+todo = "deny"
+unimplemented = "deny"
+# 禁止使用 print!/println!，强制使用 logging 系统
+print_stdout = "deny"
+print_stderr = "deny"
+# 禁止使用浮点数算术（防止精度丢失，适合金融项目，普通项目可选）
+float_arithmetic = "deny"
+# 禁止使用数组索引访问 (arr[0])，强制使用 .get() 以防止 panic
+indexing_slicing = "deny"
+# 禁止无限循环 loop，除非显式处理
+infinite_loop = "deny"
+# 禁止模块名重复 (mod foo { struct Foo {} })
+module_name_repetitions = "deny"

@@ -1,0 +1,26 @@
+# 强制使用 2021 版本特性
+edition = "2021"
+
+# 强制行宽，超过 100 字符强制换行
+max_width = 100
+
+# 强制统一换行符 (LF)
+newline_style = "Unix"
+
+# 导入语句排序与分组
+# 将导入分为：标准库、外部库、当前包
+# 将嵌套导入展开或合并 (Crate 模式会将相同 crate 的导入合并)
+# 自动重排导入顺序
+reorder_imports = true
+
+# 结构体字段对齐 (可选，会让 diff 变大，但看起来整齐)
+# struct_field_align_threshold = 20
+
+# 函数参数过多时强制多行
+fn_params_layout = "Vertical"
+
+# 强制使用字段初始化简写 (e.g., Point { x, y } 而不是 Point { x: x, y: y })
+use_field_init_shorthand = true
+
+# 总是使用 where 子句，即使只有一个 bound (更易读)
+# (需 nightly: where_single_line = false)

@@ -1,0 +1,23 @@
+[package]
+name = "floss-integration"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "ZMctf 对 FLOSS 工具的集成封装（runner + 类型定义）"
+repository = "https://example.invalid/zmctf"
+readme = "../README.md"
+keywords = ["ctf", "security", "forensics"]
+categories = ["command-line-utilities", "development-tools"]
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+log.workspace = true
+tool-runner = { path = "../tool-runner" }
+zmctf-constraints = { path = "../zmctf-constraints" }
+
+[lib]
+name = "floss_integration"
+path = "src/lib.rs"
