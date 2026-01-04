@@ -1,10 +1,11 @@
-use anyhow::Result;
+use anyhow::{bail, Result};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::{Path, PathBuf};
 use zmctf_constraints::ResourceLimits;
 
 use crate::cache::CacheConfig;
+use crate::{DetectorConfig, FlagFormat};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AppConfig {
@@ -218,6 +219,60 @@ impl AppConfig {
             max_entries: self.cache.max_entries,
             ttl_hours: self.cache.ttl_hours,
         }
+    }
+
+    /// 将 `AppConfig` 转换为 `DetectorConfig`（供检测器/HTTP API 使用）。
+    #[must_use]
+    pub fn to_detector_config(&self) -> DetectorConfig {
+        let global_input_max = self.resources.input_max_bytes;
+        let detector_input_max = u64::try_from(self.detector.max_file_size).unwrap_or(u64::MAX);
+        let effective_input_max = detector_input_max.min(global_input_max);
+
+        let mut detector_config = DetectorConfig {
+            min_string_length: self.detector.min_string_length,
+            max_string_length: self.detector.max_string_length,
+            max_file_size: usize::try_from(effective_input_max).unwrap_or(usize::MAX),
+            max_decode_depth: self.detector.max_decode_depth,
+            min_confidence: self.detector.min_confidence,
+            parallel: self.detector.parallel,
+            ..Default::default()
+        };
+
+        // 应用 AppConfig 中的自定义 flag 正则（detector.flag_patterns）
+        // 说明：无效正则会在 matcher 阶段被跳过（Regex::new 失败即忽略）。
+        for (i, pat) in self.detector.flag_patterns.iter().enumerate() {
+            let name = format!("custom:{}", i + 1);
+            detector_config
+                .flag_formats
+                .push(FlagFormat::new(&name, pat).with_priority(120));
+        }
+
+        detector_config
+    }
+
+    /// 基础配置校验（防止明显的无效值进入运行态）。
+    ///
+    /// # Errors
+    ///
+    /// 当配置字段不满足基本约束时返回错误。
+    pub fn validate(&self) -> Result<()> {
+        if self.detector.min_string_length == 0 {
+            bail!("detector.min_string_length 不能为 0");
+        }
+        if self.detector.max_string_length < self.detector.min_string_length {
+            bail!("detector.max_string_length 不能小于 detector.min_string_length");
+        }
+        if self.detector.max_decode_depth == 0 {
+            bail!("detector.max_decode_depth 不能为 0");
+        }
+        if !(0.0..=1.0).contains(&self.detector.min_confidence) {
+            bail!("detector.min_confidence 必须在 0.0~1.0 范围内");
+        }
+        if self.resources.input_max_bytes == 0 {
+            bail!("resources.input_max_bytes 不能为 0");
+        }
+
+        Ok(())
     }
 
     #[must_use]

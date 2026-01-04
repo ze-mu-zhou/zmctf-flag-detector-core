@@ -1,6 +1,7 @@
 //! `ZMctf` API 服务器入口
 
-use flag_detector::{api, DetectorConfig};
+use flag_detector::{api, AppConfig};
+use std::path::PathBuf;
 use std::sync::Once;
 
 static LOGGER_INIT: Once = Once::new();
@@ -46,9 +47,16 @@ async fn main() -> anyhow::Result<()> {
     // 初始化日志
     init_logger();
 
-    // 默认配置
-    let config = DetectorConfig::default();
+    // 读取配置（优先环境变量 ZMCTF_CONFIG，其次默认路径）
+    let config_path =
+        std::env::var_os("ZMCTF_CONFIG").map_or_else(AppConfig::default_config_path, PathBuf::from);
+    let app_config = AppConfig::load_or_default(Some(&config_path));
 
     // 启动服务器
-    api::start_server(config, 8080).await
+    let port = std::env::var("ZMCTF_PORT")
+        .ok()
+        .and_then(|p| p.parse::<u16>().ok())
+        .unwrap_or(8080);
+
+    api::start_server(app_config, config_path, port).await
 }

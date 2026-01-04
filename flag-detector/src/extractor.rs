@@ -86,6 +86,24 @@ pub fn extract_strings(
     Ok(strings)
 }
 
+/// 从字节数据提取可打印 ASCII 字符串。
+///
+/// # Errors
+///
+/// 当输入数据超过大小上限时返回错误。
+pub fn extract_strings_from_bytes(
+    data: &[u8],
+    config: &DetectorConfig,
+) -> Result<Vec<ExtractedString>> {
+    if data.len() > config.max_file_size {
+        anyhow::bail!("输入数据大小超过限制: {} bytes", data.len());
+    }
+
+    let mut strings = Vec::new();
+    extract_ascii_strings(data, config, &mut strings);
+    Ok(strings)
+}
+
 fn extract_ascii_strings(
     data: &[u8],
     config: &DetectorConfig,

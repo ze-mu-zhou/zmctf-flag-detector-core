@@ -10,8 +10,8 @@ use walkdir::WalkDir;
 use crate::cache::PersistentCache;
 use crate::config::AppConfig;
 use crate::history::HistoryManager;
-use crate::types::{DetectedFlag, FlagFormat};
-use crate::{DetectorConfig, FlagDetector};
+use crate::types::DetectedFlag;
+use crate::FlagDetector;
 
 fn duration_ms_u64(duration: std::time::Duration) -> u64 {
     u64::try_from(duration.as_millis()).unwrap_or(u64::MAX)
@@ -49,26 +49,7 @@ impl AsyncAnalyzer {
     ///
     /// 当初始化缓存/历史记录失败，或配置参数无法转换为有效的资源限制时返回错误。
     pub fn new(config: &AppConfig) -> Result<Self> {
-        let global_input_max = config.resources.input_max_bytes;
-        let detector_input_max = u64::try_from(config.detector.max_file_size).unwrap_or(u64::MAX);
-        let effective_input_max = detector_input_max.min(global_input_max);
-        let mut detector_config = DetectorConfig {
-            min_string_length: config.detector.min_string_length,
-            max_string_length: config.detector.max_string_length,
-            max_file_size: usize::try_from(effective_input_max).unwrap_or(usize::MAX),
-            max_decode_depth: config.detector.max_decode_depth,
-            min_confidence: config.detector.min_confidence,
-            parallel: config.detector.parallel,
-            ..Default::default()
-        };
-        // 应用 AppConfig 中的自定义 flag 正则（detector.flag_patterns）
-        // 说明：无效正则会在 matcher 阶段被跳过（Regex::new 失败即忽略）。
-        for (i, pat) in config.detector.flag_patterns.iter().enumerate() {
-            let name = format!("custom:{}", i + 1);
-            detector_config
-                .flag_formats
-                .push(FlagFormat::new(&name, pat).with_priority(120));
-        }
+        let detector_config = config.to_detector_config();
         let cache = if config.cache.enabled {
             Some(Arc::new(PersistentCache::new(
                 config.cache.db_path.as_deref(),
